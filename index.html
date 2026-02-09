@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Шахматка 10 недель — инструкция</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Десктоп-версия</p>
+          <h1>Шахматка 10 недель</h1>
+          <p class="subtitle">
+            Пошаговая инструкция «от А до Я» для сборки финальной версии приложения: структура
+            данных, безопасность, автоматизация и дизайн.
+          </p>
+          <div class="hero-actions">
+            <a class="primary" href="#stage-1">Начать настройку</a>
+            <a class="secondary" href="#checklist">Контрольный список</a>
+          </div>
+        </div>
+        <div class="card status-card">
+          <h3>Что получится</h3>
+          <ul>
+            <li>Планирование на 10 недель.</li>
+            <li>Сдвиг недель и архив по понедельникам.</li>
+            <li>Права доступа по ролям.</li>
+            <li>Дашборд для быстрых правок.</li>
+          </ul>
+        </div>
+      </header>
+
+      <section class="intro">
+        <div class="card">
+          <h2>Коротко о процессе</h2>
+          <p>
+            Мы приводим таблицу к единому формату, подключаем AppSheet, настраиваем автоматизации
+            и визуальную часть. Следуйте пунктам — ничего не нужно придумывать или доделывать.
+          </p>
+        </div>
+        <div class="card">
+          <h2>Роли</h2>
+          <p>
+            Менеджеры работают только со своими строками, а администратор видит всю смету и получает
+            еженедельный отчёт.
+          </p>
+        </div>
+      </section>
+
+      <section id="stage-1" class="stage">
+        <div class="stage-header">
+          <span class="tag">Этап 1</span>
+          <h2>Подготовка Google Таблицы (Фундамент)</h2>
+          <p>Меняем структуру колонок под 10-недельную «шахматку».</p>
+        </div>
+        <div class="card">
+          <ol>
+            <li>Создайте новый лист <strong>Смета</strong> (старый переименуйте в <em>Смета_Старая</em>).</li>
+            <li>Создайте лист <strong>Архив_Факта</strong> (пустой).</li>
+            <li>В листе <strong>Смета</strong> в первой строке укажите заголовки строго в порядке ниже.</li>
+          </ol>
+          <div class="grid">
+            <div>
+              <h4>Смета — заголовки</h4>
+              <pre><code>ID
+Статья
+Тип платежа
+Контрагент
+КЗ
+КЗ_Крит
+Week_0
+Week_1
+Week_2
+Week_3
+Week_4
+Week_5
+Week_6
+Week_7
+Week_8
+Week_9
+Статус
+Менеджер</code></pre>
+            </div>
+            <div>
+              <h4>Архив_Факта — заголовки</h4>
+              <pre><code>Дата архивации
+Статья
+Тип платежа
+Контрагент
+Менеджер
+Сумма</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stage-2" class="stage">
+        <div class="stage-header">
+          <span class="tag">Этап 2</span>
+          <h2>Настройка данных в AppSheet (Data)</h2>
+          <p>Регистрируем новые колонки и задаём типы с формулами.</p>
+        </div>
+        <div class="card">
+          <ol>
+            <li>В редакторе AppSheet откройте <strong>Data → Смета</strong>.</li>
+            <li>Нажмите <strong>Regenerate Structure</strong>.</li>
+            <li>Настройте каждую колонку по таблице ниже.</li>
+          </ol>
+          <div class="table">
+            <div class="row head">
+              <span>Колонка</span>
+              <span>Тип</span>
+              <span>Настройки</span>
+            </div>
+            <div class="row">
+              <span>ID</span>
+              <span>Text</span>
+              <span>Initial Value: <code>UNIQUEID()</code>, Key: ✅, Show?: ❌</span>
+            </div>
+            <div class="row">
+              <span>Статья</span>
+              <span>Enum</span>
+              <span>Valid If: <code>Справочник[Статья]</code></span>
+            </div>
+            <div class="row">
+              <span>Тип платежа</span>
+              <span>Enum</span>
+              <span>Добавьте значения: Аванс, Постоплата, Погашение кредиторской задолженности.</span>
+            </div>
+            <div class="row">
+              <span>Контрагент</span>
+              <span>Enum</span>
+              <span>Suggested Values: <code>Справочник[Контрагент]</code>, при необходимости Allow other values.</span>
+            </div>
+            <div class="row">
+              <span>КЗ / КЗ_Крит</span>
+              <span>Number</span>
+              <span>Decimal digits: 0, Thousands Separator: On, описание «в тыс. руб.»</span>
+            </div>
+            <div class="row">
+              <span>Week_0</span>
+              <span>Number</span>
+              <span>
+                Display Name: <code>"Н" &amp; WEEKNUM(TODAY()) &amp; " (" &amp; TEXT(TODAY(), "dd.mm") &amp; ")"</code>
+              </span>
+            </div>
+            <div class="row">
+              <span>Week_1…Week_9</span>
+              <span>Number</span>
+              <span>Та же формула, но с <code>TODAY()+7</code>, <code>+14</code> … <code>+63</code>.</span>
+            </div>
+            <div class="row">
+              <span>Статус</span>
+              <span>Enum</span>
+              <span>Значения: Черновик, Отправлено, Утверждено. Initial Value: Черновик.</span>
+            </div>
+            <div class="row">
+              <span>Менеджер</span>
+              <span>Email</span>
+              <span>Initial Value: <code>USEREMAIL()</code>, Editable?: ❌</span>
+            </div>
+          </div>
+          <div class="note">
+            <h4>Editable_If для сумм и контрагента</h4>
+            <pre><code>AND([Статус] &lt;&gt; "Утверждено", [Статус] &lt;&gt; "Отправлено")</code></pre>
+            <p>Менеджер редактирует только в статусе «Черновик».</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="stage-3" class="stage">
+        <div class="stage-header">
+          <span class="tag">Этап 3</span>
+          <h2>Безопасность (Security) — критично</h2>
+          <p>Менеджеры должны видеть только свои строки.</p>
+        </div>
+        <div class="card">
+          <ol>
+            <li>Перейдите в <strong>Security → Security Filters</strong>.</li>
+            <li>Выберите таблицу <strong>Смета</strong>.</li>
+            <li>Вставьте фильтр ниже, заменив email администратора.</li>
+          </ol>
+          <pre><code>OR(
+  USEREMAIL() = "ВАШ_EMAIL_АДМИНА@gmail.com",
+  [Менеджер] = USEREMAIL()
+)</code></pre>
+        </div>
+      </section>
+
+      <section id="stage-4" class="stage">
+        <div class="stage-header">
+          <span class="tag">Этап 4</span>
+          <h2>Скрипт автоматизации (мозг системы)</h2>
+          <p>По понедельникам: отправка Excel, архив и сдвиг недель.</p>
+        </div>
+        <div class="card">
+          <ol>
+            <li>В Google Таблице откройте <strong>Расширения → Apps Script</strong>.</li>
+            <li>Удалите код и вставьте скрипт ниже.</li>
+            <li>Замените <code>ВАШ_EMAIL@gmail.com</code> на ваш.</li>
+          </ol>
+          <pre><code>function mondayNightProcessing() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Смета");
+  var archiveSheet = ss.getSheetByName("Архив_Факта");
+
+  // 1. Отправка отчета (XLSX) на почту
+  var emailTo = "ВАШ_EMAIL@gmail.com";
+  var url = "https://docs.google.com/spreadsheets/d/" + ss.getId() + "/export?format=xlsx&gid=" + sheet.getSheetId();
+  var params = {
+    method: "GET",
+    headers: { "Authorization": "Bearer " + ScriptApp.getOAuthToken() },
+    muteHttpExceptions: true
+  };
+  var blob = UrlFetchApp.fetch(url, params)
+    .getBlob()
+    .setName("Смета_" + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd") + ".xlsx");
+
+  try {
+    MailApp.sendEmail({
+      to: emailTo,
+      subject: "Смета (Понедельник)",
+      body: "Файл во вложении.",
+      attachments: [blob]
+    });
+  } catch (e) {
+    Logger.log("Ошибка почты: " + e);
+  }
+
+  // 2. Архивация и сдвиг
+  var lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return;
+
+  var data = sheet.getRange(2, 1, lastRow - 1, 18).getValues();
+  var archiveData = [];
+  var today = new Date();
+
+  for (var i = 0; i &lt; data.length; i++) {
+    var row = data[i];
+    var sumWeek0 = row[6];
+    if (sumWeek0 &amp;&amp; sumWeek0 != 0) {
+      archiveData.push([today, row[1], row[2], row[3], row[17], sumWeek0]);
+    }
+  }
+
+  if (archiveData.length &gt; 0) {
+    archiveSheet.getRange(archiveSheet.getLastRow() + 1, 1, archiveData.length, 6)
+      .setValues(archiveData);
+  }
+
+  // 3. Сдвиг недель (Week 1 -&gt; Week 0)
+  var rangeToMove = sheet.getRange(2, 8, lastRow - 1, 9);
+  var valuesToMove = rangeToMove.getValues();
+  sheet.getRange(2, 7, lastRow - 1, 9).setValues(valuesToMove);
+  sheet.getRange(2, 16, lastRow - 1, 1).setValue(0);
+}</code></pre>
+          <div class="note">
+            <h4>Триггер</h4>
+            <p>Функция <strong>mondayNightProcessing</strong> → по времени → еженедельно → понедельник → 00:00–01:00.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="stage-5" class="stage">
+        <div class="stage-header">
+          <span class="tag">Этап 5</span>
+          <h2>Действие «Умное копирование» (Actions)</h2>
+          <p>Копирование строки без контрагента, чтобы менеджер выбирал заново.</p>
+        </div>
+        <div class="card">
+          <ol>
+            <li>AppSheet → <strong>Actions → New Action</strong>.</li>
+            <li>Name: <strong>Копировать строку</strong>.</li>
+            <li>Table: <strong>Смета</strong>.</li>
+            <li>Do this: <strong>App: go to another view within this app</strong>.</li>
+          </ol>
+          <pre><code>LINKTOFORM("Смета_Form",
+  "Статья", [Статья],
+  "Тип платежа", [Тип платежа],
+  "Week_0", [Week_0],
+  "Week_1", [Week_1],
+  "Week_2", [Week_2],
+  "Week_3", [Week_3],
+  "Менеджер", USEREMAIL()
+)</code></pre>
+          <p class="note">
+            Контрагент не указывается → поле будет пустым и обязательным для выбора.
+          </p>
+        </div>
+      </section>
+
+      <section id="stage-6" class="stage">
+        <div class="stage-header">
+          <span class="tag">Этап 6</span>
+          <h2>Визуализация и дизайн (UX)</h2>
+          <p>Собираем таблицу для работы на ПК и наводим «красоту».</p>
+        </div>
+        <div class="card">
+          <div class="grid">
+            <div>
+              <h4>Основные параметры вида</h4>
+              <ul>
+                <li>View: <strong>План (Table)</strong>.</li>
+                <li>Group by: <strong>Статья</strong>, затем <strong>Тип платежа</strong>.</li>
+                <li>Group Aggregate: <strong>SUM</strong> по Week_0…Week_9.</li>
+                <li>Column Order: Контрагент, КЗ, КЗ_Крит, Week_0…Week_9, Статус.</li>
+                <li>Quick Edit Columns: Week_0…Week_9.</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Format Rules</h4>
+              <ul>
+                <li><strong>Жирные заголовки</strong>: TRUE → Тип платежа → Bold 1.2.</li>
+                <li><strong>Красный долг</strong>: Тип платежа = «Погашение кредиторской задолженности» → Week columns → красный.</li>
+                <li><strong>Черновик</strong>: Статус = «Черновик» → Контрагент → иконка карандаш.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="note">
+            <h4>Проверка формата цифр</h4>
+            <p>Week... и КЗ должны быть типом <strong>Number</strong> (не Price), digits = 0.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="checklist" class="checklist">
+        <div class="stage-header">
+          <span class="tag">Финальный чек-лист</span>
+          <h2>Перед запуском проверьте</h2>
+        </div>
+        <div class="card checklist-grid">
+          <label><input type="checkbox" /> Листы «Смета» и «Архив_Факта» созданы, порядок колонок верный.</label>
+          <label><input type="checkbox" /> Типы данных и формулы в AppSheet заполнены.</label>
+          <label><input type="checkbox" /> Editable_If установлен для сумм и контрагента.</label>
+          <label><input type="checkbox" /> Security Filter ограничивает доступ менеджеров.</label>
+          <label><input type="checkbox" /> Скрипт автоматизации вставлен и настроен триггер.</label>
+          <label><input type="checkbox" /> Action «Копировать строку» работает без контрагента.</label>
+          <label><input type="checkbox" /> Таблица «План» сгруппирована и Quick Edit включён.</label>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>Готово! Теперь у вас профессиональная система для управления сметой на 10 недель.</p>
+      </footer>
+    </div>
+  </body>
+</html>
